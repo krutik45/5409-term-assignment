@@ -8,11 +8,13 @@ import Checkout from "./components/checkout/CheckoutHtml";
 import Home from "./components/home/HomeHtml";
 import Product from "./components/product/ProductHtml";
 import Contact from "./components/contact/ContactHtml";
+import NavBar from "./components/Navbar/NavbarHtml";
 
 function App() {
   return (
     <>
       <Router>
+        <NavBar/>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Product />} />

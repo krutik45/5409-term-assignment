@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "../Navbar/NavbarHtml";
 import { CircularArrayContainer } from "./HomeStyles";
 
 const HomeHtml: React.FC = () => {
@@ -12,7 +11,7 @@ const HomeHtml: React.FC = () => {
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       {/* <CircularArrayContainer>
         <div className="image-slider">
           {images.map((image, index) => (
