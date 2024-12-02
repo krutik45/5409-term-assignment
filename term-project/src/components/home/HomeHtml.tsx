@@ -1,13 +1,20 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { CircularArrayContainer, HeroSection, InfoSection } from "./HomeStyles";
 
 const HomeHtml: React.FC = () => {
+  const navigate = useNavigate();
+
   const images = [
     "https://term-project-5409.s3.us-east-1.amazonaws.com/laptops/L1.jpg",
     "https://term-project-5409.s3.us-east-1.amazonaws.com/phones/p1.jpg",
     "https://term-project-5409.s3.us-east-1.amazonaws.com/laptops/L2.jpg",
     "https://term-project-5409.s3.us-east-1.amazonaws.com/phones/p2.jpg",
   ];
+
+  const handleShopNowClick = () => {
+    navigate("/login");
+  };
 
   return (
     <>
@@ -17,7 +24,9 @@ const HomeHtml: React.FC = () => {
           Your one-stop shop for premium laptops and phones at unbeatable
           prices!
         </p>
-        <button className="cta-btn">Shop Now</button>
+        <button className="cta-btn" onClick={handleShopNowClick}>
+          Shop Now
+        </button>
       </HeroSection>
 
       <CircularArrayContainer>
@@ -36,7 +45,7 @@ const HomeHtml: React.FC = () => {
       </CircularArrayContainer>
 
       <InfoSection>
-        <h2>Why Choose ShopNow?</h2>
+        <h2>Why Choose Bikayi?</h2>
         <div className="features">
           <div className="feature">
             <h3>Premium Quality</h3>

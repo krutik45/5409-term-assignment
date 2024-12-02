@@ -9,19 +9,23 @@ import Home from "./components/home/HomeHtml";
 import Product from "./components/product/ProductHtml";
 import Contact from "./components/contact/ContactHtml";
 import NavBar from "./components/Navbar/NavbarHtml";
+import Login from "./components/buttons/Login/Login";
+import SignUp from "./components/Signup/Signup";
 
 function App() {
   return (
     <>
       <Router>
-        <NavBar/>
+        <NavBar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Product />} />
-          <Route path="/products/:id" element={<ProductList />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/products/:id" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
         </Routes>
       </Router>
     </>

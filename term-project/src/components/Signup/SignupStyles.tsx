@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const ContactFormContainer = styled.div`
+export const SignUpContainer = styled.div`
   padding: 40px;
   background-color: #f9f9f9;
   display: flex;
@@ -13,43 +13,6 @@ export const ContactFormContainer = styled.div`
     margin-bottom: 30px;
     text-align: center;
   }
-
-  .content-wrapper {
-    display: flex;
-    flex-direction: column;
-    max-width: 1000px;
-    width: 100%;
-    gap: 30px;
-  }
-`;
-
-export const ContactDetails = styled.div`
-  text-align: center;
-
-  h3 {
-    font-size: 24px;
-    color: #007bff;
-    margin-bottom: 10px;
-  }
-
-  p {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 10px;
-  }
-
-  strong {
-    font-weight: bold;
-  }
-
-  a {
-    color: #007bff;
-    text-decoration: none;
-    margin: 0 10px;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 `;
 
 export const FormWrapper = styled.div`
@@ -61,13 +24,6 @@ export const FormWrapper = styled.div`
   width: 100%;
   margin: 0 auto; /* Center the form wrapper horizontally */
 
-  h3 {
-    font-size: 24px;
-    color: #007bff;
-    margin-bottom: 20px;
-    text-align: center; /* Center the heading */
-  }
-
   .form-group {
     margin-bottom: 20px;
 
@@ -78,17 +34,13 @@ export const FormWrapper = styled.div`
       margin-bottom: 5px;
     }
 
-    input, textarea {
+    input {
       width: 100%;
       padding: 12px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
       margin-top: 5px;
-    }
-
-    textarea {
-      resize: vertical;
     }
   }
 
