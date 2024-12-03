@@ -6,7 +6,7 @@ exports.handler = async (event) => {
   console.log("Received event:", event);
 
   if (
-    !event.bookingId ||
+    !event.hotelName ||
     !event.customerName ||
     !event.customerEmail ||
     !event.customerPhNo ||
@@ -26,7 +26,7 @@ exports.handler = async (event) => {
 
   const reviewData = {
     reviewId,
-    bookingId: event.bookingId,
+    hotelName: event.hotelName,
     customerName: event.customerName,
     review: event.review,
     customerEmail: event.customerEmail,

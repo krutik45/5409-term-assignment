@@ -17,7 +17,7 @@ exports.handler = async (event) => {
   }
 
   const params = {
-    TableName: "Hotels",
+    TableName: "Reviews",
     FilterExpression: "hotelName = :hotelName",
     ExpressionAttributeValues: {
       ":hotelName": hotelName,
@@ -26,7 +26,7 @@ exports.handler = async (event) => {
 
   try {
     const data = await dynamoDB.scan(params).promise();
-    console.log("data in hotel", data);
+    console.log("Fetched reviews:", data);
 
     if (data.Items.length === 0) {
       return {
@@ -35,31 +35,29 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
         "Access-Control-Allow-Headers": "Authorization, Content-Type",
         body: JSON.stringify({
-          message: "No hotel found with the given name.",
+          message: "No reviews found for the hotel.",
         }),
       };
     }
 
-    const hotel = data.Items[0];
-    console.log("hotel", hotel);
     return {
       statusCode: 200,
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
       "Access-Control-Allow-Headers": "Authorization, Content-Type",
       body: JSON.stringify({
-        message: "Hotel found successfully.",
-        hotelId: hotel.hotelId,
+        message: "Reviews fetched successfully.",
+        reviews: data.Items,
       }),
     };
   } catch (error) {
-    console.log("Error fetching hotel:", error);
+    console.log("Error fetching reviews:", error);
     return {
       statusCode: 500,
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
       "Access-Control-Allow-Headers": "Authorization, Content-Type",
-      body: JSON.stringify({ message: "Error fetching hotel." }),
+      body: JSON.stringify({ message: "Error fetching reviews." }),
     };
   }
 };
