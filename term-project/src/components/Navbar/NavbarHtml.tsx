@@ -83,6 +83,34 @@ function NavBar() {
                 Home
               </a>
             </li>
+            <li>
+              <a
+                href="/reviews"
+                className={`block py-1 px-3 text-sm font-medium rounded-md transition duration-200 ${
+                  isActive("/reviews")
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+                }`}
+                style={{ textDecoration: "none" }}
+                aria-current={isActive("/reviews") ? "page" : undefined}
+              >
+                Reviews
+              </a>
+            </li>
+            <li>
+              <a
+                href="/sendreview"
+                className={`block py-1 px-3 text-sm font-medium rounded-md transition duration-200 ${
+                  isActive("/sendreview")
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+                }`}
+                style={{ textDecoration: "none" }}
+                aria-current={isActive("/sendreview") ? "page" : undefined}
+              >
+                Send Review Request
+              </a>
+            </li>
             {/* <li>
               <a
                 href="/products"

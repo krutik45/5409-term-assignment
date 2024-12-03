@@ -12,6 +12,9 @@ import NavBar from "./components/Navbar/NavbarHtml";
 import Login from "./components/Login/Login";
 import SignUp from "./components/Signup/Signup";
 import ProductDetail from "./components/product/ProductDetail";
+import AddHotel from "./components/AddHotel/AddHotel";
+import Reviews from "./components/reviews/Reviews";
+import SendReviewRequest from "./components/SendReviewRequest/SendReviewRequest";
 
 function App() {
   return (
@@ -20,13 +23,15 @@ function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductList />} />
+          <Route path="/addhotel" element={<AddHotel />} />
           <Route path="/product/:productId" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/reviews" element={<Reviews />} />
+          <Route path="/sendreview" element={<SendReviewRequest />} />
         </Routes>
       </Router>
     </>

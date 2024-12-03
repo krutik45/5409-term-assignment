@@ -35,11 +35,10 @@ const Login: React.FC = () => {
       console.log("response", response, "data", data);
 
       if (data.statusCode === 200) {
-
-        localStorage.setItem("userEmail", email); 
+        localStorage.setItem("userEmail", email);
 
         // Redirect to products page after successful login
-        navigate("/products");
+        navigate("/addhotel");
       } else {
         setError(data.message || "An error occurred during login.");
       }
