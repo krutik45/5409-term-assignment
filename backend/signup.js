@@ -14,6 +14,9 @@ exports.handler = async (event) => {
   if (!event.name || !event.email || !event.password) {
     return {
       statusCode: 400,
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
       body: JSON.stringify({ message: "All fields are required." }),
     };
   }
@@ -31,6 +34,9 @@ exports.handler = async (event) => {
     if (existingUser.Item) {
       return {
         statusCode: 400,
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
         body: JSON.stringify({ message: "User already exists." }),
       };
     }
@@ -44,6 +50,9 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
       body: JSON.stringify({
         message: "User registered successfully.",
         user: { email: event.email, name: event.name },
@@ -53,6 +62,9 @@ exports.handler = async (event) => {
     console.log("Error saving user:", error);
     return {
       statusCode: 500,
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
       body: JSON.stringify({ message: "Error creating user." }),
     };
   }

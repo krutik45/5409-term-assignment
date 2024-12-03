@@ -1,13 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginContainer, FormSection } from "./LoginStyles";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted");
+
+    setError(null);
+
+    const loginData = {
+      email,
+      password,
+    };
+
+    try {
+      const response: any = await fetch(
+        "https://as8t6c8kwl.execute-api.us-east-1.amazonaws.com/prod/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginData),
+        }
+      );
+
+      const data = await response.json();
+      console.log("response", response, "data", data);
+
+      if (data.statusCode === 200) {
+
+        localStorage.setItem("userEmail", email); 
+
+        // Redirect to products page after successful login
+        navigate("/products");
+      } else {
+        setError(data.message || "An error occurred during login.");
+      }
+    } catch (error) {
+      setError("Failed to connect to the server. Please try again later.");
+    }
   };
 
   return (
@@ -23,6 +61,8 @@ const Login: React.FC = () => {
               type="email"
               id="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -33,9 +73,13 @@ const Login: React.FC = () => {
               type="password"
               id="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
+
+          {error && <p className="error-message">{error}</p>}
 
           <div className="form-group">
             <button type="submit" className="cta-btn">

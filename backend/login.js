@@ -8,6 +8,12 @@ exports.handler = async (event) => {
   if (!event.email || !event.password) {
     return {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods":
+          "GET, PUT, PATCH, POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
+      },
       body: JSON.stringify({ message: "Email and password are required." }),
     };
   }
@@ -25,6 +31,12 @@ exports.handler = async (event) => {
     if (!user.Item) {
       return {
         statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods":
+            "GET, PUT, PATCH, POST, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Authorization, Content-Type",
+        },
         body: JSON.stringify({ message: "User not found." }),
       };
     }
@@ -32,6 +44,12 @@ exports.handler = async (event) => {
     if (event.password !== user.Item.password) {
       return {
         statusCode: 401,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods":
+            "GET, PUT, PATCH, POST, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Authorization, Content-Type",
+        },
         body: JSON.stringify({ message: "Invalid password." }),
       };
     }
@@ -40,6 +58,12 @@ exports.handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({
         message: "Login successful.",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods":
+            "GET, PUT, PATCH, POST, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Authorization, Content-Type",
+        },
         user: { email: user.Item.email, name: user.Item.name },
       }),
     };
@@ -47,6 +71,12 @@ exports.handler = async (event) => {
     console.log("Error logging in user:", error);
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods":
+          "GET, PUT, PATCH, POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
+      },
       body: JSON.stringify({ message: "Error logging in user." }),
     };
   }

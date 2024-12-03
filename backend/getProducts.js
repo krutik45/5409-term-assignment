@@ -23,6 +23,9 @@ exports.handler = async (event) => {
   } catch (error) {
     console.error("Error:", error);
     return {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
       statusCode: 500,
       body: JSON.stringify({ message: "Internal Server Error" }),
     };

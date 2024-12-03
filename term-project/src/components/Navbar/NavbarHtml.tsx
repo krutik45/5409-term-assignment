@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function NavBar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is logged in from localStorage
+    const email = localStorage.getItem("userEmail");
+    if (email) {
+      setUserEmail(email);
+    }
+  }, []);
 
   const toggleNavbar = () => {
     setIsNavbarOpen(!isNavbarOpen);
   };
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
 
   return (
     <nav className="bg-white shadow-md border-b-2 dark:bg-gray-900">
@@ -95,6 +109,24 @@ function NavBar() {
                 Contact
               </a>
             </li>
+
+            {/* Conditionally show login button or avatar */}
+            {userEmail ? (
+              <li className="flex items-center">
+                <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                  {userEmail.charAt(0).toUpperCase()}
+                </div>
+              </li>
+            ) : (
+              <li>
+                <button
+                  onClick={handleLoginClick}
+                  className="block py-1 px-3 text-sm font-medium rounded-md text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Login
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       </div>

@@ -10,6 +10,9 @@ exports.handler = async (event) => {
     if (!event.id) {
       return {
         statusCode: 400,
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
         body: JSON.stringify({ message: "Product ID is required" }),
       };
     }
@@ -26,6 +29,9 @@ exports.handler = async (event) => {
     if (!data.Item) {
       return {
         statusCode: 404,
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
         body: JSON.stringify({ message: "Product not found" }),
       };
     }
@@ -43,6 +49,9 @@ exports.handler = async (event) => {
   } catch (error) {
     console.log("Error:", error);
     return {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
       statusCode: 500,
       body: JSON.stringify({ message: "Internal Server Error" }),
     };
