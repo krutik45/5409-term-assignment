@@ -46,3 +46,62 @@ export const HotelDetails = styled.p`
     color: #333;
   }
 `;
+
+export const TabContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+`;
+
+export const Tab = styled.div<{ active: boolean }>`
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin: 0 1rem;
+  border-bottom: ${({ active }) => (active ? "2px solid #007bff" : "none")};
+  color: ${({ active }) => (active ? "#007bff" : "#555")};
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+
+  &:hover {
+    color: #007bff;
+  }
+`;
+
+export const TabContent = styled.div`
+  margin-top: 2rem;
+  padding: 1rem;
+  border-top: 1px solid #ddd;
+  h3 {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  .cta-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+`;
+
+export const CtaButton = styled.button`
+  background-color: #007bff;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+  &:hover {
+    background-color: #0056b3;
+  }
+`;

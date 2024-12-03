@@ -1,7 +1,17 @@
 import React from "react";
-import { HotelContainer, HotelCard, HotelInfo, HotelTitle, HotelDetails } from "./HotelsStyles";
+import {
+  HotelContainer,
+  HotelCard,
+  HotelInfo,
+  HotelTitle,
+  HotelDetails,
+  CtaButton, // assuming you have a button styled component
+} from "./HotelsStyles";
+import { useNavigate } from "react-router-dom";
 
 const Hotels: React.FC = () => {
+  const navigate = useNavigate();
+
   // Hardcoded hotel data
   const hotels = [
     {
@@ -27,23 +37,45 @@ const Hotels: React.FC = () => {
     },
   ];
 
+  // Handle hotel click to redirect to the hotel detail page
+  const handleHotelClick = (hotelId: string) => {
+    navigate(`/hotel/${hotelId}`);
+  };
+
+  // Handle Add Hotel click to navigate to the "Add Hotel" page
+  const handleAddHotelClick = () => {
+    navigate("/addHotel"); // Make sure the path is correct for the Add Hotel page
+  };
+
   return (
     <HotelContainer>
       <h2>Your Hotels</h2>
       <div className="grid">
         {hotels.length > 0 ? (
           hotels.map((hotel) => (
-            <HotelCard key={hotel.hotelId}>
+            <HotelCard
+              key={hotel.hotelId}
+              onClick={() => handleHotelClick(hotel.hotelId)}
+            >
               <HotelTitle>{hotel.hotelName}</HotelTitle>
               <HotelInfo>
-                <HotelDetails><strong>Address:</strong> {hotel.address}</HotelDetails>
-                <HotelDetails><strong>Email:</strong> {hotel.email}</HotelDetails>
-                <HotelDetails><strong>Phone:</strong> {hotel.phoneNumber}</HotelDetails>
+                <HotelDetails>
+                  <strong>Address:</strong> {hotel.address}
+                </HotelDetails>
+                <HotelDetails>
+                  <strong>Email:</strong> {hotel.email}
+                </HotelDetails>
+                <HotelDetails>
+                  <strong>Phone:</strong> {hotel.phoneNumber}
+                </HotelDetails>
               </HotelInfo>
             </HotelCard>
           ))
         ) : (
-          <p>No hotels found.</p>
+          <div>
+            <p>No hotels found.</p>
+            <CtaButton onClick={handleAddHotelClick}>Add Hotel</CtaButton>
+          </div>
         )}
       </div>
     </HotelContainer>

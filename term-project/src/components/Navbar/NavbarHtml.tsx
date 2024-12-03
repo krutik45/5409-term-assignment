@@ -83,7 +83,7 @@ function NavBar() {
                 Home
               </a>
             </li>
-            <li>
+            {/* <li>
               <a
                 href="/reviews"
                 className={`block py-1 px-3 text-sm font-medium rounded-md transition duration-200 ${
@@ -110,7 +110,7 @@ function NavBar() {
               >
                 Send Review Request
               </a>
-            </li>
+            </li> */}
             {/* <li>
               <a
                 href="/products"

@@ -38,7 +38,7 @@ const Login: React.FC = () => {
         localStorage.setItem("userEmail", email);
 
         // Redirect to products page after successful login
-        navigate("/addhotel");
+        navigate("/hotels");
       } else {
         setError(data.message || "An error occurred during login.");
       }
