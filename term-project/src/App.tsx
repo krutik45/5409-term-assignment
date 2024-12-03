@@ -15,6 +15,8 @@ import ProductDetail from "./components/product/ProductDetail";
 import AddHotel from "./components/AddHotel/AddHotel";
 import Reviews from "./components/reviews/Reviews";
 import SendReviewRequest from "./components/SendReviewRequest/SendReviewRequest";
+import FeedbackForm from "./components/Feedback/FeedbackForm";
+import AddBooking from "./components/CreateBooking/AddBooking";
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/sendreview" element={<SendReviewRequest />} />
+          <Route path="/feedback" element={<FeedbackForm />} />
+          <Route path="/addbooking" element={<AddBooking />} />
         </Routes>
       </Router>
     </>
