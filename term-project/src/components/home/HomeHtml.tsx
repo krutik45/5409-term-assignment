@@ -19,17 +19,17 @@ const HomeHtml: React.FC = () => {
   return (
     <>
       <HeroSection>
-        <h1>Welcome to Bikayi</h1>
+        <h1>Welcome to Review Booster</h1>
         <p>
           Your one-stop shop for premium laptops and phones at unbeatable
           prices!
         </p>
         <button className="cta-btn" onClick={handleShopNowClick}>
-          Shop Now
+          Add your hotel now
         </button>
       </HeroSection>
 
-      <CircularArrayContainer>
+      {/* <CircularArrayContainer>
         <div className="image-slider">
           {images.map((image, index) => (
             <div className="slide" key={index}>
@@ -42,9 +42,9 @@ const HomeHtml: React.FC = () => {
             </div>
           ))}
         </div>
-      </CircularArrayContainer>
+      </CircularArrayContainer> */}
 
-      <InfoSection>
+      {/* <InfoSection>
         <h2>Why Choose Bikayi?</h2>
         <div className="features">
           <div className="feature">
@@ -65,7 +65,7 @@ const HomeHtml: React.FC = () => {
             <p>Enjoy quick and reliable delivery straight to your doorstep.</p>
           </div>
         </div>
-      </InfoSection>
+      </InfoSection> */}
     </>
   );
 };

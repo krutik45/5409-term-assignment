@@ -1,62 +1,65 @@
 import styled from "styled-components";
 
 export const SignUpContainer = styled.div`
-  padding: 40px;
-  background-color: #f9f9f9;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-
-  h2 {
-    font-size: 28px;
-    color: #333;
-    margin-bottom: 30px;
-    text-align: center;
-  }
+  height: 100vh;
+  background-color: #f7f7f7;
+  padding: 20px;
 `;
 
 export const FormWrapper = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
-  margin: 0 auto; /* Center the form wrapper horizontally */
+  max-width: 400px;
+`;
 
-  .form-group {
-    margin-bottom: 20px;
+export const Title = styled.h2`
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+`;
 
-    label {
-      display: block;
-      font-size: 16px;
-      color: #333;
-      margin-bottom: 5px;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-top: 5px;
+export const InputGroup = styled.div`
+  margin-bottom: 15px;
+  label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    &:focus {
+      outline: none;
+      border-color: #007bff;
     }
   }
+`;
 
-  .cta-btn {
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    padding: 12px 20px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #0056b3;
-    }
+export const Button = styled.button`
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+    background-color: #0056b3;
+  }
+  &:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
   }
 `;

@@ -33,7 +33,7 @@ function NavBar() {
           className="text-xl font-semibold text-gray-800 dark:text-white"
           style={{ textDecoration: "none" }}
         >
-          Bikayi
+          Review Booster
         </a>
 
         <button
@@ -83,7 +83,7 @@ function NavBar() {
                 Home
               </a>
             </li>
-            <li>
+            {/* <li>
               <a
                 href="/products"
                 className={`block py-1 px-3 text-sm font-medium rounded-md transition duration-200 ${
@@ -108,7 +108,7 @@ function NavBar() {
               >
                 Contact
               </a>
-            </li>
+            </li> */}
 
             {/* Conditionally show login button or avatar */}
             {userEmail ? (

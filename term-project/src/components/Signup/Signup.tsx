@@ -1,16 +1,23 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SignUpContainer, FormWrapper } from "./SignupStyles";
+import {
+  SignUpContainer,
+  FormWrapper,
+  InputGroup,
+  Button,
+  Title,
+} from "./SignupStyles";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "",
+    ownerName: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +46,7 @@ const SignUp: React.FC = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              name: formData.name,
+              ownerName: formData.ownerName,
               email: formData.email,
               password: formData.password,
             }),
@@ -50,7 +57,7 @@ const SignUp: React.FC = () => {
         console.log("data signup", data);
         if (data.statusCode === 200) {
           console.log("Sign-Up successful:", data);
-          navigate("/login");
+          navigate("/add-hotel"); // Navigate to the hotel addition page after successful sign-up
         } else {
           setError(data.message || "Failed to sign up");
         }
@@ -64,22 +71,22 @@ const SignUp: React.FC = () => {
 
   return (
     <SignUpContainer>
-      <h2>Create Your Account</h2>
       <FormWrapper>
+        <Title>Create Your Account</Title>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Full Name</label>
+          <InputGroup>
+            <label htmlFor="ownerName">Owner Name</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+              id="ownerName"
+              name="ownerName"
+              value={formData.ownerName}
               onChange={handleChange}
               required
             />
-          </div>
+          </InputGroup>
 
-          <div className="form-group">
+          <InputGroup>
             <label htmlFor="email">Email Address</label>
             <input
               type="email"
@@ -89,9 +96,9 @@ const SignUp: React.FC = () => {
               onChange={handleChange}
               required
             />
-          </div>
+          </InputGroup>
 
-          <div className="form-group">
+          <InputGroup>
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -101,9 +108,9 @@ const SignUp: React.FC = () => {
               onChange={handleChange}
               required
             />
-          </div>
+          </InputGroup>
 
-          <div className="form-group">
+          <InputGroup>
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
               type="password"
@@ -113,13 +120,13 @@ const SignUp: React.FC = () => {
               onChange={handleChange}
               required
             />
-          </div>
+          </InputGroup>
 
           {error && <div className="error-message">{error}</div>}
 
-          <button type="submit" className="cta-btn" disabled={loading}>
+          <Button type="submit" disabled={loading}>
             {loading ? "Signing Up..." : "Sign Up"}
-          </button>
+          </Button>
         </form>
       </FormWrapper>
     </SignUpContainer>
