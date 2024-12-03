@@ -5,7 +5,13 @@ const { v4: uuidv4 } = require("uuid");
 exports.handler = async (event) => {
   console.log("event =>", event);
 
-  if (!event.hotelName || !event.address || !event.email || !event.phone) {
+  if (
+    !event.hotelName ||
+    !event.address ||
+    !event.email ||
+    !event.phone ||
+    !event.ownerEmail
+  ) {
     return {
       statusCode: 400,
       "Access-Control-Allow-Origin": "*",
@@ -46,6 +52,7 @@ exports.handler = async (event) => {
         hotelName: event.hotelName,
         address: event.address,
         email: event.email,
+        ownerEmail: event.ownerEmail,
         phone: event.phone,
         createdAt: new Date().toISOString(),
       },
@@ -65,6 +72,7 @@ exports.handler = async (event) => {
           hotelName: event.hotelName,
           address: event.address,
           email: event.email,
+          ownerEmail: event.ownerEmail,
           phone: event.phone,
         },
       }),

@@ -17,6 +17,7 @@ import Reviews from "./components/reviews/Reviews";
 import SendReviewRequest from "./components/SendReviewRequest/SendReviewRequest";
 import FeedbackForm from "./components/Feedback/FeedbackForm";
 import AddBooking from "./components/CreateBooking/AddBooking";
+import Hotels from "./components/Hotel/Hotels";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/sendreview" element={<SendReviewRequest />} />
           <Route path="/feedback" element={<FeedbackForm />} />
           <Route path="/addbooking" element={<AddBooking />} />
+          <Route path="/hotels" element={<Hotels />} />
         </Routes>
       </Router>
     </>
