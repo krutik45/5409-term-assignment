@@ -20,6 +20,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { REACT_APP_API_ENDPOINT } = process.env;
+    console.log("REACT_APP_API_ENDPOINT", REACT_APP_API_ENDPOINT);
     const payload = {
       email: email,
       password: password,
