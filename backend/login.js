@@ -1,47 +1,35 @@
 const AWS = require("aws-sdk");
-const dynamoDB = new AWS.DynamoDB.DocumentClient();
+const kms = new AWS.KMS();
+const dynamodb = new AWS.DynamoDB.DocumentClient();
+
+const TABLE_NAME = "Users";
 
 exports.handler = async (event) => {
-  console.log("event=>", event);
-  console.log("event.email", event.email, "event.password", event.password);
-
-  if (!event.email || !event.password) {
-    return {
-      statusCode: 400,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods":
-          "GET, PUT, PATCH, POST, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Authorization, Content-Type",
-      },
-      body: JSON.stringify({ message: "Email and password are required." }),
-    };
-  }
-
   try {
-    const params = {
-      TableName: "Users",
-      Key: {
-        email: event.email,
-      },
-    };
+    let { email, password } = event;
+    console.log("event=>", event);
+    console.log("email, password ", email, password);
 
-    const user = await dynamoDB.get(params).promise();
+    if (event.body && typeof event.body === "string") {
+      const eventData = JSON.parse(event.body);
+      email = eventData.email;
+      password = eventData.password;
+    }
 
-    if (!user.Item) {
+    const user = await getUserByEmail(email);
+    console.log("user", user);
+    if (user && (await verifyPassword(password, user.password))) {
       return {
-        statusCode: 404,
+        statusCode: 200,
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods":
             "GET, PUT, PATCH, POST, DELETE, OPTIONS",
           "Access-Control-Allow-Headers": "Authorization, Content-Type",
         },
-        body: JSON.stringify({ message: "User not found." }),
+        body: JSON.stringify({ message: "Login successful" }),
       };
-    }
-
-    if (event.password !== user.Item.password) {
+    } else {
       return {
         statusCode: 401,
         headers: {
@@ -50,25 +38,11 @@ exports.handler = async (event) => {
             "GET, PUT, PATCH, POST, DELETE, OPTIONS",
           "Access-Control-Allow-Headers": "Authorization, Content-Type",
         },
-        body: JSON.stringify({ message: "Invalid password." }),
+        body: JSON.stringify({ message: "Invalid email or password" }),
       };
     }
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "Login successful.",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods":
-            "GET, PUT, PATCH, POST, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Authorization, Content-Type",
-        },
-        user: { email: user.Item.email, name: user.Item.name },
-      }),
-    };
   } catch (error) {
-    console.log("Error logging in user:", error);
+    console.log("Error:", error);
     return {
       statusCode: 500,
       headers: {
@@ -77,7 +51,36 @@ exports.handler = async (event) => {
           "GET, PUT, PATCH, POST, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Authorization, Content-Type",
       },
-      body: JSON.stringify({ message: "Error logging in user." }),
+      body: JSON.stringify({ message: "Internal server error" }),
     };
   }
 };
+
+async function verifyPassword(plainPassword, encryptedPassword) {
+  const decryptedPassword = await decryptPassword(
+    encryptedPassword,
+    process.env.KMS_KEY_ARN
+  );
+
+  return plainPassword === decryptedPassword;
+}
+
+async function decryptPassword(encryptedPassword, kmsKeyArn) {
+  const params = {
+    CiphertextBlob: Buffer.from(encryptedPassword, "base64"),
+    KeyId: kmsKeyArn,
+  };
+
+  const decryptedData = await kms.decrypt(params).promise();
+  return decryptedData.Plaintext.toString();
+}
+
+async function getUserByEmail(email) {
+  const params = {
+    TableName: TABLE_NAME,
+    Key: { Email: email },
+  };
+
+  const { Item } = await dynamodb.get(params).promise();
+  return Item;
+}

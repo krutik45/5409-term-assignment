@@ -1,0 +1,138 @@
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate  } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import {clearCart} from '../redux/actions/index';
+import axios from 'axios';
+
+const Checkout = () => {
+    const numofItems = useSelector((state) => state.addItem);
+    const dispatch = useDispatch()
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        address: '',
+        country: '',
+        state: '',
+        zip: ''
+    });
+
+    const navigate = useNavigate ();
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log(formData); // Log form data to console
+
+        const orderData = {
+            items: numofItems,
+        };
+
+        const payload = {
+            ...formData,
+            Email: formData.email, // Rename email to Email as per requirement
+            orderData: orderData
+        };
+
+        const { REACT_APP_API_ENDPOINT } = process.env;
+        try {
+            const response = await axios.post(`${REACT_APP_API_ENDPOINT}/order`, JSON.stringify(payload));
+            console.log(response.data);
+            dispatch(clearCart());
+            navigate.push('/');
+        } catch (error) {
+            console.error('Error submitting order:', error);
+            // Handle error
+        }
+    };
+
+    var cartTotal = 0
+    const itemList = (cartItem) => {
+        const price = parseFloat(cartItem.Price.replace('$', ''));
+        cartTotal = cartTotal + price;
+        return (
+            <li className="list-group-item justify-content-between lh-sm">
+                <div>
+                    <h6 className="my-0">{cartItem.Title}</h6>
+                </div>
+                <span className="text-muted">{cartItem.Price}</span>
+            </li>
+        );
+    };
+
+    return (
+        <>
+            <div className="container my-5">
+                <div className="row g-5">
+                    <div className="col-md-5 col-lg-4 order-md-last">
+                        <h4 className="d-flex justify-content-between align-items-center mb-3">
+                            <span className="text">Your cart</span>
+                            <span className="badge bg-secondary">{numofItems.length}</span>
+                        </h4>
+                        <ul className="list-group mb-3">
+                            {numofItems.map(itemList)}
+
+                            <li className="list-group-item d-flex justify-content-between">
+                                <span>Total</span>
+                                <strong>${cartTotal}</strong>
+                            </li>
+                        </ul>
+                    </div>
+                    <div className="col-md-7 col-lg-8">
+                        <h4 className="mb-3">Billing address</h4>
+                        <form className="needs-validation" noValidate onSubmit={handleSubmit}>
+                            <div className="row g-3">
+                                <div className="col-sm-6">
+                                    <label htmlFor="firstName" className="form-label">First name</label>
+                                    <input type="text" className="form-control" id="firstName" name="firstName" value={formData.firstName} onChange={handleInputChange} required />
+                                </div>
+                                <div className="col-sm-6">
+                                    <label htmlFor="lastName" className="form-label">Last name</label>
+                                    <input type="text" className="form-control" id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange} required />
+                                </div>
+                                <div className="col-12">
+                                    <label htmlFor="email" className="form-label">Email <span className="text-muted">(Optional)</span></label>
+                                    <input type="email" className="form-control" id="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="you@example.com" />
+                                </div>
+                                <div className="col-12">
+                                    <label htmlFor="address" className="form-label">Address</label>
+                                    <input type="text" className="form-control" id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="1234 Main St" required />
+                                </div>
+                                <div className="col-md-5">
+                                    <label htmlFor="country" className="form-label">Country</label>
+                                    <select className="form-select" id="country" name="country" value={formData.country} onChange={handleInputChange} required>
+                                        <option value="">Choose</option>
+                                        <option>Canada</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <label htmlFor="state" className="form-label">State</label>
+                                    <select className="form-select" id="state" name="state" value={formData.state} onChange={handleInputChange} required>
+                                        <option value="">Choose...</option>
+                                        <option>Halifax</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-3">
+                                    <label htmlFor="zip" className="form-label">Zip</label>
+                                    <input type="text" className="form-control" id="zip" name="zip" value={formData.zip} onChange={handleInputChange} placeholder="" required />
+                                </div>
+                            </div>
+                            <hr className="my-4" />
+                            <button className="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export default Checkout

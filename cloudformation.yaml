@@ -1,0 +1,520 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation file for review-booster Application
+Resources:
+  ReviewsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ReviewsTable
+      AttributeDefinitions:
+        - AttributeName: reviewId
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: reviewId
+          KeyType: HASH
+
+  HotelsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Hotels
+      AttributeDefinitions:
+        - AttributeName: hotelName
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: hotelName
+          KeyType: HASH
+
+  BookingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Bookings
+      AttributeDefinitions:
+        - AttributeName: bookingId
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: bookingId
+          KeyType: HASH
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UsersTable
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+
+  KMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "KMS key for authorization"
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: key-default-1
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: "*"
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::571606100626:role/LabRole"
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey
+              - kms:DescribeKey
+            Resource: "*"
+
+  # SNS for Topic
+  SNSMessageTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: "ReviewRequestNotificationTopic"
+
+  # Lambda
+  SignupFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: signupLambda
+      Code:
+        S3Bucket: term-project-lambdas
+        S3Key: signup.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: signup.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  LoginFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: loginLambda
+      Code:
+        S3Bucket: term-project-lambdas
+        S3Key: login.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: login.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs22.x
+      Timeout: 30
+      MemorySize: 128
+
+  AddHotelFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: addHotelLambda
+      Code:
+        S3Bucket: term-project-lambdas
+        S3Key: addHotel.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: addHotel.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs22.x
+      Timeout: 30
+      MemorySize: 128
+
+  AddBookingFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: addBookingLambda
+      Code:
+        S3Bucket: term-project-lambdas
+        S3Key: addBooking.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: addBooking.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs22.x
+      Timeout: 30
+      MemorySize: 128
+
+  FetchReviewsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: fetchReviewsLambda
+      Code:
+        S3Bucket: term-project-lambdas
+        S3Key: fetchReviews.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: fetchReviews.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs22.x
+      Timeout: 30
+      MemorySize: 128
+
+  AddReviewsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: addReviewsLambda
+      Code:
+        S3Bucket: term-project-lambdas
+        S3Key: addReviews.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: addReviews.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs22.x
+      Timeout: 30
+      MemorySize: 128
+
+  # API Gateway Rest API
+  ReviewBoosterApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: review-booster-api
+      Description: API for lambda function to get and post
+
+  # / login endpoint
+  LoginResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ReviewBoosterApi.RootResourceId
+      PathPart: "login"
+      RestApiId: !Ref ReviewBoosterApi
+
+  # / signup endpoint
+  SignupResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ReviewBoosterApi.RootResourceId
+      PathPart: "signup"
+      RestApiId: !Ref ReviewBoosterApi
+
+  # / addHotel endpoint
+  AddHotelResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ReviewBoosterApi.RootResourceId
+      PathPart: "addhotel"
+      RestApiId: !Ref ReviewBoosterApi
+
+  # / addBooking endpoint
+  AddBookingResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ReviewBoosterApi.RootResourceId
+      PathPart: "addbooking"
+      RestApiId: !Ref ReviewBoosterApi
+
+  # / addReviews endpoint
+  AddReviewsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ReviewBoosterApi.RootResourceId
+      PathPart: "addreviews"
+      RestApiId: !Ref ReviewBoosterApi
+
+  # / fetchReviews endpoint
+  FetchReviewsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ReviewBoosterApi.RootResourceId
+      PathPart: "fetchreviews"
+      RestApiId: !Ref ReviewBoosterApi
+
+  LoginMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref LoginResource
+      RestApiId: !Ref ReviewBoosterApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${LoginFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  SignupMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref SignupResource
+      RestApiId: !Ref ReviewBoosterApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${SignupFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  AddHotelMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref AddHotelResource
+      RestApiId: !Ref ReviewBoosterApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${AddHotelFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  AddBookingMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref AddBookingResource
+      RestApiId: !Ref ReviewBoosterApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${AddBookingFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  AddReviewsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref AddReviewsResource
+      RestApiId: !Ref ReviewBoosterApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${AddReviewsFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  FetchReviewsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref FetchReviewsResource
+      RestApiId: !Ref ReviewBoosterApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${FetchReviewsFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  LambdaApiGatewayPermissionPostForLogin:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt LoginFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${ReviewBoosterApi}/*/POST/login
+
+  LambdaApiGatewayPermissionPostForSignup:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt SignupFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${ReviewBoosterApi}/*/POST/signup
+
+  LambdaApiGatewayPermissionPostForAddHotel:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt AddHotelFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${ReviewBoosterApi}/*/POST/addhotel
+
+  LambdaApiGatewayPermissionPostForAddBooking:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt AddBookingFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${ReviewBoosterApi}/*/POST/addbooking
+
+  LambdaApiGatewayPermissionPostForAddReviews:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt AddReviewsFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${ReviewBoosterApi}/*/POST/addreviews
+
+  LambdaApiGatewayPermissionPostForFetchReviews:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt FetchReviewsFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${ReviewBoosterApi}/*/POST/fetchReviews
+
+  ItemsApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - LoginMethod
+      - SignupMethod
+      - AddHotelMethod
+      - AddBookingMethod
+      - AddReviewsMethod
+      - FetchReviewsMethod
+
+    Properties:
+      RestApiId: !Ref ReviewBoosterApi
+      StageName: prod
+
+  # CORS Configuration for ApplicationApi
+  ItemsApiRootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ReviewBoosterApi
+      ResourceId: !GetAtt ReviewBoosterApi.RootResourceId
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,DELETE,PUT,GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ""
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP, SSH and React app access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: "22"
+          ToPort: "22"
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: "3000"
+          ToPort: "3000"
+          CidrIp: 0.0.0.0/0
+
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-080e1f13689e07408 # Update with the latest Ubuntu AMI ID
+      InstanceType: t3.medium
+      KeyName: vockey
+      SecurityGroups:
+        - Ref: EC2SecurityGroup
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          # Update the instance and install required packages
+          sudo apt-get update -y
+          sudo apt install -y curl git
+
+          # Install Node.js (update the version if necessary)
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt install -y nodejs
+
+          # Clone your React app repository (update with your repo URL)
+          cd /home/ubuntu
+          git clone https://github.com/krutik45/5409-term-assignment.git
+          cd 5409-term-assignment/term-project
+
+          # Install dependencies
+          npm install
+
+          # Modify package.json to allow public access
+          sed -i 's/"start": "react-scripts start"/"start": "react-scripts start --host 0.0.0.0"/' package.json
+
+          # Start the React app (in the background)
+          nohup npm start > /dev/null 2>&1 &
+
+Outputs:
+  ItemsApiPublicEndpoint:
+    Description: "Endpoint for items API"
+    Value: !Sub "https://${ReviewBoosterApi}.execute-api.us-east-1.amazonaws.com/prod"
+  Ec2InstancePublicIP:
+    Description: "Public IP of the EC2 Instance"
+    Value: !GetAtt MyEC2Instance.PublicIp

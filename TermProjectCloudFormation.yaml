@@ -1,0 +1,506 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation file for Ecommerce Application
+Resources:
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Items
+      AttributeDefinitions:
+        - AttributeName: Title
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Title
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  ContactUsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ContactUs
+      AttributeDefinitions:
+        - AttributeName: FullName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: FullName
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Orders
+      AttributeDefinitions:
+        - AttributeName: Email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Email
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Users
+      AttributeDefinitions:
+        - AttributeName: Email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Email
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  KMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "KMS key for authorization"
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: key-default-1
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: "*"
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::571606100626:role/LabRole"
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey
+              - kms:DescribeKey
+            Resource: "*"
+
+  # SNS for Topic
+  SNSMessageTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: "MessageNotificationTopic"
+
+  GetItemsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: getItems
+      Code:
+        S3Bucket: term-project-5409
+        S3Key: getItems.zip
+      Handler: getItems.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  LoginFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: login
+      Code:
+        S3Bucket: term-project-5409
+        S3Key: login.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: login.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  RegisterFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: register
+      Code:
+        S3Bucket: term-project-5409
+        S3Key: register.zip
+      Environment:
+        Variables:
+          KMS_KEY_ARN: !GetAtt KMSKey.Arn
+      Handler: register.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  ContactUsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: contactUs
+      Code:
+        S3Bucket: term-project-5409
+        S3Key: contactUs.zip
+      Handler: contactUs.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  OrderFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: order
+      Code:
+        S3Bucket: term-project-5409
+        S3Key: order.zip
+      Handler: order.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  EmailRegisterFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: emailRegister
+      Code:
+        S3Bucket: term-project-5409
+        S3Key: emailRegister.zip
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SNSMessageTopic
+      Handler: emailRegister.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  MailFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: mail
+      Code:
+        S3Bucket: term-project-5409
+        S3Key: mail.zip
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SNSMessageTopic
+      Handler: mail.handler
+      Role: arn:aws:iam::571606100626:role/LabRole
+      Runtime: nodejs16.x
+      Timeout: 30
+      MemorySize: 128
+
+  # API Gateway Rest API
+  Api:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: TermProjectApi
+      Description: API for lambda function to get and post
+
+  # /items endpoint
+  ItemsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: "items"
+      RestApiId: !Ref Api
+
+  # /contactus endpoint
+  ContactResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: "contactus"
+      RestApiId: !Ref Api
+
+  # / order endpoint
+  OrderResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: "order"
+      RestApiId: !Ref Api
+
+  # / auth endpoint
+  AuthResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: "login"
+      RestApiId: !Ref Api
+
+  # / register endpoint
+  RegisterResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: "register"
+      RestApiId: !Ref Api
+
+  # / emailregister endpoint
+  EmailRegisterResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: "emailregister"
+      RestApiId: !Ref Api
+
+  # / email endpoint
+  EmailResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: "email"
+      RestApiId: !Ref Api
+
+  ItemsGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      ResourceId: !Ref ItemsResource
+      RestApiId: !Ref Api
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${GetItemsFunction.Arn}/invocations
+      MethodResponses:
+        - StatusCode: "200"
+
+  ContactMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref ContactResource
+      RestApiId: !Ref Api
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${ContactUsFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  OrderMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref OrderResource
+      RestApiId: !Ref Api
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${OrderFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  LoginMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref AuthResource
+      RestApiId: !Ref Api
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${LoginFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  RegisterMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref RegisterResource
+      RestApiId: !Ref Api
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${RegisterFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  EmailRegisterMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref EmailRegisterResource
+      RestApiId: !Ref Api
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${EmailRegisterFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  EmailMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref EmailResource
+      RestApiId: !Ref Api
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${MailFunction.Arn}/invocations
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  LambdaApiGatewayPermissionGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt GetItemsFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${Api}/*/GET/items
+
+  LambdaApiGatewayPermissionPostForContact:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt ContactUsFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${Api}/*/POST/contactus
+
+  LambdaApiGatewayPermissionPostForOrder:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt OrderFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${Api}/*/POST/order
+
+  LambdaApiGatewayPermissionPostForAuth:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt LoginFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${Api}/*/POST/auth
+
+  LambdaApiGatewayPermissionPostForRegister:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt RegisterFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${Api}/*/POST/register
+
+  LambdaApiGatewayPermissionPostForEmailRegister:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt EmailRegisterFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${Api}/*/POST/emailregister
+
+  LambdaApiGatewayPermissionPostForEmail:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt MailFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:us-east-1:${AWS::AccountId}:${Api}/*/POST/email
+
+  ItemsApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ItemsGetMethod
+      - ContactMethod
+      - OrderMethod
+      - LoginMethod
+      - RegisterMethod
+      - EmailRegisterMethod
+      - EmailMethod
+    Properties:
+      RestApiId: !Ref Api
+      StageName: prod
+
+  # CORS Configuration for ApplicationApi
+  ItemsApiRootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !GetAtt Api.RootResourceId
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,DELETE,PUT,GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ""
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+Outputs:
+  ItemsApiPublicEndpoint:
+    Description: "Endpoint for items API"
+    Value: !Sub "https://${Api}.execute-api.us-east-1.amazonaws.com/prod"
