@@ -5,7 +5,7 @@ import axios from "axios";
 const Product = () => {
   const [items, setItems] = useState([]);
   const { REACT_APP_API_ENDPOINT } = process.env;
-
+  console.log("REACT_APP_API_ENDPOINT", REACT_APP_API_ENDPOINT);
   useEffect(() => {
     const fetchData = async () => {
       try {

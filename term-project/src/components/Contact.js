@@ -16,6 +16,7 @@ const Contact = () => {
     e.preventDefault();
     console.log(formData);
     const { REACT_APP_API_ENDPOINT } = process.env;
+    console.log("REACT_APP_API_ENDPOINT", REACT_APP_API_ENDPOINT);
     try {
       // First API call with full payload
       const response1 = await axios.post(

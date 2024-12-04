@@ -10,7 +10,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const [data, setData] = useState();
   const { REACT_APP_API_ENDPOINT } = process.env;
-  console.log("in details");
+  console.log("in details", REACT_APP_API_ENDPOINT);
   useEffect(() => {
     axios
       .get(`${REACT_APP_API_ENDPOINT}/items`)
