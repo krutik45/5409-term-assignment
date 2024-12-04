@@ -47,7 +47,7 @@ const Login = () => {
             email: email,
           };
           const response = await axios.post(
-            `https://3x20qxlue1.execute-api.us-east-1.amazonaws.com/prod/emailregister`,
+            `${REACT_APP_API_ENDPOINT}/emailregister`,
             JSON.stringify(payload2)
           );
           console.log("Registration Email has been sent:", response.data);
@@ -77,7 +77,7 @@ const Login = () => {
     };
     try {
       const response = await axios.post(
-        `https://t1vjqgqapl.execute-api.us-east-1.amazonaws.com/prod/login`,
+        `${REACT_APP_API_ENDPOINT}/login`,
         JSON.stringify(payload)
       );
       console.log("Login successful:", response.data);

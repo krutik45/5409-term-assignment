@@ -9,9 +9,7 @@ const Product = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://t1vjqgqapl.execute-api.us-east-1.amazonaws.com/prod/items`
-        );
+        const response = await axios.get(`${REACT_APP_API_ENDPOINT}/items`);
         setItems(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
