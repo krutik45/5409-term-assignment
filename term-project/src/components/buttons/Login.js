@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const Modal = ({ showModal, handleClose, children }) => {
+  if (!showModal) return null;
+
+  return (
+    <div style={styles.modalBackdrop}>
+      <div style={styles.modal}>
+        <button style={styles.closeBtn} onClick={handleClose}>
+          &times;
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [subscribe, setSubscribe] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
     const storedUserName = localStorage.getItem("userName");
     if (storedUserName) {
       setUserName(storedUserName);
@@ -20,7 +36,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { REACT_APP_API_ENDPOINT } = process.env;
-    console.log("REACT_APP_API_ENDPOINT", REACT_APP_API_ENDPOINT);
     const payload = {
       email: email,
       password: password,
@@ -33,7 +48,12 @@ const Login = () => {
       console.log("Registration successful:", response.data);
       localStorage.setItem("userName", email);
       setUserName(email);
+
+      setShowRegisterModal(false);
     } catch (error) {
+      setShowRegisterModal(false);
+      alert("Something went wrong, please try again!");
+
       console.error(
         "Error:",
         error.response ? error.response.data : error.message
@@ -42,21 +62,12 @@ const Login = () => {
 
     try {
       if (subscribe) {
-        try {
-          const payload2 = {
-            email: email,
-          };
-          const response = await axios.post(
-            `${REACT_APP_API_ENDPOINT}/emailregister`,
-            JSON.stringify(payload2)
-          );
-          console.log("Registration Email has been sent:", response.data);
-        } catch (error) {
-          console.error(
-            "Error:",
-            error.response ? error.response.data : error.message
-          );
-        }
+        const payload2 = { email: email };
+        await axios.post(
+          `${REACT_APP_API_ENDPOINT}/emailregister`,
+          JSON.stringify(payload2)
+        );
+        console.log("Registration Email has been sent.");
       } else {
         console.log("Checkbox is not checked. Email has not been sent.");
       }
@@ -84,7 +95,11 @@ const Login = () => {
       localStorage.setItem("userName", email);
       setUserName(email);
       setLoggedIn(true);
+
+      setShowLoginModal(false);
     } catch (error) {
+      alert("Something went wrong, please try again!");
+      setShowLoginModal(false);
       console.error(
         "Error:",
         error.response ? error.response.data : error.message
@@ -95,7 +110,6 @@ const Login = () => {
   const handleLogout = () => {
     setLoggedIn(false);
     setUserName("");
-    // Remove username from localStorage
     localStorage.removeItem("userName");
   };
 
@@ -103,18 +117,18 @@ const Login = () => {
     <>
       <style>
         {`
-        .custom-btn {
-          font-size: 16px;
-          border-radius: 20px;
-          padding: 8px 15px;
-          transition: all 0.3s ease;
-        }
+          .custom-btn {
+            font-size: 16px;
+            border-radius: 20px;
+            padding: 8px 15px;
+            transition: all 0.3s ease;
+          }
 
-        .custom-btn:hover {
-          background-color: #7FC7D9;
-          color: white;
-          border-color: #7FC7D9;
-        }
+          .custom-btn:hover {
+            background-color: #7FC7D9;
+            color: white;
+            border-color: #7FC7D9;
+          }
         `}
       </style>
       {loggedIn ? (
@@ -129,148 +143,138 @@ const Login = () => {
           <button
             type="button"
             className="custom-btn btn ms-auto"
-            data-bs-toggle="modal"
-            data-bs-target="#modalforregister"
+            onClick={() => setShowRegisterModal(true)}
           >
             <span className="me-1"></span> Register
           </button>
           <button
             type="button"
             className="custom-btn btn"
-            data-bs-toggle="modal"
-            data-bs-target="#modalforlogin"
+            onClick={() => setShowLoginModal(true)}
           >
             <span className="me-1"></span> Login
           </button>
         </>
       )}
-      {/* Register Modal */}
-      <div
-        className="modal fade"
-        id="modalforregister"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
+
+      <Modal
+        showModal={showRegisterModal}
+        handleClose={() => setShowRegisterModal(false)}
       >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">
-                Register
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="emailInput" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="emailInput"
-                    aria-describedby="emailHelp"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="passwordInput" className="form-label">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="passwordInput"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <div className="form-check mb-3">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    id="subscribeCheckbox"
-                    checked={subscribe}
-                    onChange={(e) => setSubscribe(e.target.checked)}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="subscribeCheckbox"
-                  >
-                    Subscribe to marketing news
-                  </label>
-                </div>
-                <button type="submit" className="btn btn-outline-primary">
-                  Register
-                </button>
-              </form>
-            </div>
+        <h5>Register</h5>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="emailInput" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              className="form-control"
+              id="emailInput"
+              aria-describedby="emailHelp"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
-        </div>
-      </div>
-      {/* Login Modal */}
-      <div
-        className="modal fade"
-        id="modalforlogin"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
+          <div className="mb-3">
+            <label htmlFor="passwordInput" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="passwordInput"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="form-check mb-3">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="subscribeCheckbox"
+              checked={subscribe}
+              onChange={(e) => setSubscribe(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="subscribeCheckbox">
+              Subscribe to marketing news
+            </label>
+          </div>
+          <button type="submit" className="btn btn-outline-primary">
+            Register
+          </button>
+        </form>
+      </Modal>
+
+      <Modal
+        showModal={showLoginModal}
+        handleClose={() => setShowLoginModal(false)}
       >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">
-                Login
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleLoginSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="emailInputLogin" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="emailInputLogin"
-                    aria-describedby="emailHelp"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="passwordInputLogin" className="form-label">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="passwordInputLogin"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <button type="submit" className="btn btn-outline-primary">
-                  Login
-                </button>
-              </form>
-            </div>
+        <h5>Login</h5>
+        <form onSubmit={handleLoginSubmit}>
+          <div className="mb-3">
+            <label htmlFor="emailInput" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              className="form-control"
+              id="emailInput"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
-        </div>
-      </div>
+          <div className="mb-3">
+            <label htmlFor="passwordInput" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="passwordInput"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-outline-primary">
+            Login
+          </button>
+        </form>
+      </Modal>
     </>
   );
+};
+
+const styles = {
+  modalBackdrop: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 1000,
+  },
+  modal: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    backgroundColor: "white",
+    padding: "20px",
+    borderRadius: "8px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    minWidth: "300px",
+  },
+  closeBtn: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+    fontSize: "20px",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+  },
 };
 
 export default Login;

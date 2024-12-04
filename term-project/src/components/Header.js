@@ -88,10 +88,8 @@ const Header = () => {
         `}
       </style>
 
-      {/* Navbar Structure */}
       <nav className="navbar navbar-expand-lg navbar-light">
         <div className="container-fluid">
-          {/* Left Section - Navigation Links */}
           <div className="navbar-nav me-auto">
             <li className="nav-item">
               <NavLink exact className="nav-link" to="/">
@@ -118,10 +116,6 @@ const Header = () => {
             </li>
           </div>
 
-          {/* Center Section - Branding */}
-          <span className="navbar-brand">Term Project</span>
-
-          {/* Right Section - Buttons (Login and Cart) */}
           <div className="navbar-right">
             <Login />
             <CartBtn />

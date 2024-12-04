@@ -30,7 +30,7 @@ const Checkout = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData); // Log form data to console
+    console.log(formData);
 
     const orderData = {
       items: numofItems,
@@ -38,7 +38,7 @@ const Checkout = () => {
 
     const payload = {
       ...formData,
-      Email: formData.email, // Rename email to Email as per requirement
+      Email: formData.email,
       orderData: orderData,
     };
 
@@ -54,7 +54,6 @@ const Checkout = () => {
       navigate.push("/");
     } catch (error) {
       console.error("Error submitting order:", error);
-      // Handle error
     }
   };
 
@@ -63,7 +62,7 @@ const Checkout = () => {
     const price = parseFloat(cartItem.Price.replace("$", ""));
     cartTotal = cartTotal + price;
     return (
-      <li className="list-group-item justify-content-between lh-sm">
+      <li className="list-group-item d-flex justify-content-between align-items-center shadow-sm">
         <div>
           <h6 className="my-0">{cartItem.Title}</h6>
         </div>
@@ -73,145 +72,151 @@ const Checkout = () => {
   };
 
   return (
-    <>
-      <div className="container my-5">
-        <div className="row g-5">
-          <div className="col-md-5 col-lg-4 order-md-last">
-            <h4 className="d-flex justify-content-between align-items-center mb-3">
-              <span className="text">Your cart</span>
-              <span className="badge bg-secondary">{numofItems.length}</span>
-            </h4>
-            <ul className="list-group mb-3">
-              {numofItems.map(itemList)}
+    <div className="container my-5">
+      <div className="row g-5">
+        <div className="col-md-5 col-lg-4 order-md-last">
+          <div className="card shadow-lg">
+            <div className="card-header text-center">
+              <h4 className="mb-0">Your Cart</h4>
+            </div>
+            <div className="card-body">
+              <ul className="list-group mb-3">
+                {numofItems.map(itemList)}
 
-              <li className="list-group-item d-flex justify-content-between">
-                <span>Total</span>
-                <strong>${cartTotal}</strong>
-              </li>
-            </ul>
-          </div>
-          <div className="col-md-7 col-lg-8">
-            <h4 className="mb-3">Billing address</h4>
-            <form
-              className="needs-validation"
-              noValidate
-              onSubmit={handleSubmit}
-            >
-              <div className="row g-3">
-                <div className="col-sm-6">
-                  <label htmlFor="firstName" className="form-label">
-                    First name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="col-sm-6">
-                  <label htmlFor="lastName" className="form-label">
-                    Last name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="col-12">
-                  <label htmlFor="email" className="form-label">
-                    Email <span className="text-muted">(Optional)</span>
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="you@example.com"
-                  />
-                </div>
-                <div className="col-12">
-                  <label htmlFor="address" className="form-label">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    placeholder="1234 Main St"
-                    required
-                  />
-                </div>
-                <div className="col-md-5">
-                  <label htmlFor="country" className="form-label">
-                    Country
-                  </label>
-                  <select
-                    className="form-select"
-                    id="country"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Choose</option>
-                    <option>Canada</option>
-                  </select>
-                </div>
-                <div className="col-md-4">
-                  <label htmlFor="state" className="form-label">
-                    State
-                  </label>
-                  <select
-                    className="form-select"
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Choose...</option>
-                    <option>Halifax</option>
-                  </select>
-                </div>
-                <div className="col-md-3">
-                  <label htmlFor="zip" className="form-label">
-                    Zip
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="zip"
-                    name="zip"
-                    value={formData.zip}
-                    onChange={handleInputChange}
-                    placeholder=""
-                    required
-                  />
-                </div>
-              </div>
-              <hr className="my-4" />
-              <button className="w-100 btn btn-primary btn-lg" type="submit">
-                Continue to checkout
-              </button>
-            </form>
+                <li className="list-group-item d-flex justify-content-between">
+                  <span>
+                    <strong>Total</strong>
+                  </span>
+                  <strong>${cartTotal}</strong>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
+
+        <div className="col-md-7 col-lg-8">
+          <h4 className="mb-3">Billing Address</h4>
+          <form className="needs-validation" noValidate onSubmit={handleSubmit}>
+            <div className="row g-3">
+              <div className="col-sm-6">
+                <label htmlFor="firstName" className="form-label">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="col-sm-6">
+                <label htmlFor="lastName" className="form-label">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="col-12">
+                <label htmlFor="email" className="form-label">
+                  Email <span className="text-muted">(Optional)</span>
+                </label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="you@example.com"
+                />
+              </div>
+
+              <div className="col-12">
+                <label htmlFor="address" className="form-label">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  placeholder="1234 Main St"
+                  required
+                />
+              </div>
+
+              <div className="col-md-5">
+                <label htmlFor="country" className="form-label">
+                  Country
+                </label>
+                <select
+                  className="form-select"
+                  id="country"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Choose</option>
+                  <option>Canada</option>
+                </select>
+              </div>
+
+              <div className="col-md-4">
+                <label htmlFor="state" className="form-label">
+                  State
+                </label>
+                <select
+                  className="form-select"
+                  id="state"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Choose...</option>
+                  <option>Halifax</option>
+                </select>
+              </div>
+
+              <div className="col-md-3">
+                <label htmlFor="zip" className="form-label">
+                  Zip
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="zip"
+                  name="zip"
+                  value={formData.zip}
+                  onChange={handleInputChange}
+                  placeholder=""
+                  required
+                />
+              </div>
+            </div>
+
+            <hr className="my-4" />
+            <button className="w-100 btn btn-primary btn-lg" type="submit">
+              Continue to Checkout
+            </button>
+          </form>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -66,7 +66,7 @@ const Product = () => {
 
 const styles = {
   container: {
-    backgroundColor: "#f8f9fa", // Light background for the section
+    backgroundColor: "#f8f9fa",
     padding: "20px",
   },
   card: {
@@ -77,7 +77,7 @@ const styles = {
   },
   cardImage: {
     objectFit: "cover",
-    height: "200px", // Uniform image size
+    height: "200px",
   },
   cardTitle: {
     fontSize: "1.25rem",

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios"; // Import Axios library for making HTTP requests
+import axios from "axios";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +18,6 @@ const Contact = () => {
     const { REACT_APP_API_ENDPOINT } = process.env;
     console.log("REACT_APP_API_ENDPOINT", REACT_APP_API_ENDPOINT);
     try {
-      // First API call with full payload
       const response1 = await axios.post(
         `${REACT_APP_API_ENDPOINT}/contactus`,
         JSON.stringify(formData)
@@ -31,7 +30,6 @@ const Contact = () => {
       });
       alert("Message sent successfully!");
 
-      // Second API call with payload containing only the email
       const emailPayload = {
         email: formData.email,
       };
@@ -65,14 +63,6 @@ const Contact = () => {
             </div>
           </div>
           <div className="row">
-            {/* <div className="col-md-5 d-flex justify-content-center">
-              <img
-                src="/assets/images/contactUs.jpg"
-                alt="Contact Us"
-                height="300px"
-                width="300px"
-              />
-            </div> */}
             <div className="col-md-6">
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">

@@ -19,9 +19,6 @@ const ProductDetail = () => {
         const it = response.data.find((item) => item.id === String(id));
         console.log(it);
         setItem(it);
-        // const it = data.find(item => item.id === pid)
-        // console.log(it)
-        // setItem(data.find(item => item.id === pid));
       })
       .catch((error) => {
         console.error("Error fetching data:", error);

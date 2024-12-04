@@ -1,16 +1,14 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const CartBtn = () => {
-    // We get a state of addItems
-    // Write the name of the file not the function
-    const state = useSelector((state) => state.addItem);
+  const state = useSelector((state) => state.addItem);
 
-    return (
-        <>
-            <style>
-                {`
+  return (
+    <>
+      <style>
+        {`
                 .cart-btn {
                     font-size: 16px;
                     border-radius: 20px;
@@ -24,12 +22,12 @@ const CartBtn = () => {
                     border-color: #7FC7D9;
                 }
                 `}
-            </style>
-            <NavLink to="/cart" className="cart-btn btn ms-2">
-                <span className="me-1"></span> Cart ({state.length})
-            </NavLink>
-        </>
-    );
+      </style>
+      <NavLink to="/cart" className="cart-btn btn ms-2">
+        <span className="me-1"></span> Cart ({state.length})
+      </NavLink>
+    </>
+  );
 };
 
 export default CartBtn;
